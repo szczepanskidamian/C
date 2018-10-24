@@ -1,38 +1,32 @@
-#include <sys/ioctl.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
+#define ARGS 10
+#define X0 -5.0f
+#define X1 5.0f
+#define Y0 -4.0f
+#define Y1 4.0f
+#define SIZEX 20.0f
+#define SIZEY 80.0f
 
-int func(int x, int a, int b, int c);
 
 int main(){
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int a;
-    int b;
-    int c;
-    int y;
-    printf("Podaj a:\n");
-    scanf("%d", &a);
-    printf("Podaj b:\n");
-    scanf("%d", &b);
-    printf("Podaj c:\n");
-    scanf("%d", &c);
-    printf("%d\n", w.ws_col);
-    for (int i=-8; i<=8; i++){
-        y=func(i,a,b,c);
-        for (int j=-(w.ws_col/2); j <= (w.ws_col/2); j++){
-            if (j == y){
-                printf("*");
-            }
-            else{
-                printf(" ");
-            }
-        }
-        printf("\n");
-    }
-}
-
-
-int func(int x, int a, int b, int c){
-    return a * x * x + b * x + c;
+	float a, b, c;
+	int i, j, inty;
+	float y, x, dl;
+	float stepx;
+	float stepy; 
+	
+	stepy = (Y1-Y0)/SIZEY;
+	stepx = (X1-X0)/SIZEX;
+	printf("podaj wspolczynniki a b i c\n");
+	scanf("%f%f%f", &a, &b, &c);
+	for (i = 0; i <= SIZEX; i++){
+		x = X0 + i*stepx;
+		y = c + x*(a*x + b);
+		dl = (y - Y0)/stepy;
+		for (j=0; j < (int)y; j++) putchar(' ');
+		putchar('*');
+		putchar('\n');
+	} 	
+	return 0;
 }
