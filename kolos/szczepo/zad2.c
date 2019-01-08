@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define ROZMIAR 3
+#define ROZMIAR 10
 
 unsigned tablica[ROZMIAR][ROZMIAR];
 
