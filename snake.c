@@ -16,17 +16,16 @@ Wezel *ogon = NULL;
 int x=0, y=1;
 
 void wypisz() {
-  Wezel *iterator = glowa;
+  Wezel *iterator = ogon;
 
   if(iterator == NULL){
     printf("Pusta lista\n");
   }
-  mvaddstr(iterator->x, iterator->y,"@");
-  iterator = iterator->nastepny;
-  while (iterator != NULL) {
+  while (iterator != glowa) {
     mvaddstr(iterator->x, iterator->y,"o");
-    iterator = iterator->nastepny;
+    iterator = iterator->poprzedni;
   }
+  mvaddstr(iterator->x, iterator->y,"@");
 }
 
 void go_to(int x, int y){
@@ -89,14 +88,31 @@ bool inSnake(int x, int y){
   }
   return false;
 }
+
+void restart(){
+  x=0;
+  y=1;
+  glowa = NULL;
+  ogon = NULL;
+  setup();
+}
+
+void setup(){
+  push_back(ROZMIAR/2,ROZMIAR/2);
+  push_back(ROZMIAR/2,ROZMIAR/2-1);
+  push_back(ROZMIAR/2,ROZMIAR/2-2);
+}
+
+void genFood(){
+  
+}
+
 //Proszę dokonczyc gre.
 //compilacja: gcc snake.c -lncurses
 int main(void) 
 {
   WINDOW * mainwin;
-  push_back(ROZMIAR/2,ROZMIAR/2);
-  push_back(ROZMIAR/2,ROZMIAR/2-1);
-  push_back(ROZMIAR/2,ROZMIAR/2-2);
+  setup();
 
   // Initializacja ncurses
   if ( (mainwin = initscr()) == NULL ) {
@@ -117,6 +133,7 @@ int main(void)
   int owoc_x = rand() % ROZMIAR-2;
   int owoc_y = rand() % ROZMIAR-2;
   int points = 0;
+  int hscore = 0;
   char tekst[6];
 
   bool quit = false;
@@ -175,10 +192,12 @@ int main(void)
       if(glowa->x==owoc_x && glowa->y == owoc_y){
         push_back(ogon->x, ogon->y);
         points += 10;
+        if (points > hscore) hscore += 10;
       }
       owoc_x = rand() % ROZMIAR-2;
       owoc_y = rand() % ROZMIAR-2;
     }
+
     for (int x=0; x<=ROZMIAR; x++){
       mvaddstr(x, 0,"#");
       mvaddstr(x, ROZMIAR, "#");
@@ -186,18 +205,22 @@ int main(void)
     for (int y=0; y<=ROZMIAR; y++){
       mvaddstr(0, y, "#");
       mvaddstr(ROZMIAR, y, "#");
-    }
-    sprintf(tekst, "Punkty: %d", points);
+    } 
+    sprintf(tekst, "Points: %d", points);
     mvaddstr(ROZMIAR+2, 2, tekst);  
-    mvaddstr(ROZMIAR+5, 4, "Sterowanie: W, S, D, A");  
+    sprintf(tekst, "Highscore: %d", hscore);
+    mvaddstr(ROZMIAR+3, 2, tekst);  
+    mvaddstr(ROZMIAR+5, 2, "Move: W, S, D, A");  
+    mvaddstr(ROZMIAR+6, 2, "Pause: SPACEBAR");  
+    mvaddstr(ROZMIAR+7, 2, "QUIT: Q");  
     if (!pause){
       go_to(x, y);
     }
     wypisz();
     refresh();
-    if (glowa->y==ROZMIAR || glowa->y==0 || glowa->x==ROZMIAR || glowa->x==0) quit = true;
-    if (kolizja()){
-      quit = true;
+    if (glowa->y==ROZMIAR || glowa->y==0 || glowa->x==ROZMIAR || glowa->x==0 || kolizja()){
+      restart();
+      points = 0;
     }
 
   } while( ! quit );
